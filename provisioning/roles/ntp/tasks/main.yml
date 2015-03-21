@@ -1,0 +1,16 @@
+---
+- name: Install ntp package
+  apt: name=ntp state=present
+
+- name: Check time zone
+  shell: diff /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+  register: check_timezone_japan
+  failed_when: check_timezone_japan.rc not in [0, 1, 2]
+  changed_when: false
+
+- name: Make sure it is Japan time
+  command: cp /usr/share/zoneinfo/Asia/Tokyo /etc/localtime
+  when: check_timezone_japan.rc != 0
+
+- name: Start ntp Service
+  service: name=ntp state=started enabled=true

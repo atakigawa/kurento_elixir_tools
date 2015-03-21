@@ -1,0 +1,6 @@
+src_base: /usr/local/src
+
+src_ruby:
+  url: http://cache.ruby-lang.org/pub/ruby/2.1/ruby-2.1.2.tar.gz
+  tarname: ruby-2.1.2.tar.gz
+  dirname: ruby-2.1.2

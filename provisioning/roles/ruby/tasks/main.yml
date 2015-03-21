@@ -1,0 +1,32 @@
+---
+- name: Install dependencies
+  apt: name={{ item }} state=present
+  with_items:
+    - zlib1g-dev
+    - libssl-dev
+    - libreadline-dev
+    - libyaml-dev
+    - libcurl4-openssl-dev
+
+- name: Get tarball
+  get_url: url={{ src_ruby.url }} dest={{ src_base }}/{{ src_ruby.tarname }}
+
+- name: Untar src
+  command: tar zxf {{ src_ruby.tarname }}
+    chdir={{ src_base }}
+    creates={{ src_base }}/{{ src_ruby.dirname }}
+
+- name: Check ruby installed
+  shell: ls /usr/local/bin | grep ruby
+  register: ruby_is_present
+  ignore_errors: true
+  changed_when: false
+
+- name: Build and install ruby
+  shell: >
+    ./configure --prefix=/usr/local --disable-install-doc &&
+    make &&
+    make install
+    chdir={{ src_base }}/{{ src_ruby.dirname }}
+    creates=/usr/bin/ruby
+  when: ruby_is_present|failed

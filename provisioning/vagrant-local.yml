@@ -1,0 +1,12 @@
+# called from vagrant
+---
+- name: Setup Kurento Media Server on local vm
+  gather_facts: no
+  hosts: all
+  vars:
+  sudo: yes
+  roles:
+    - common
+    - ntp
+    - ruby
+    - nodejs

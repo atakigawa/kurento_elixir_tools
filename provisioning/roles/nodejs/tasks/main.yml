@@ -1,0 +1,56 @@
+---
+
+- name: Install nvm
+  shell: curl https://raw.githubusercontent.com/creationix/nvm/master/install.sh | sh
+    creates=~/.nvm
+  ignore_errors: true
+  sudo: no
+
+- name: Check node installed
+  shell: |
+    . $HOME/.nvm/nvm.sh
+    nvm ls | grep v{{ nodejs_version }}
+    executable=/bin/bash
+  register: node_is_present
+  ignore_errors: true
+  changed_when: false
+  sudo: no
+
+- name: Install node
+  shell: |
+    . $HOME/.nvm/nvm.sh
+    nvm install v{{ nodejs_version }}
+    nvm alias default stable
+    executable=/bin/bash
+  ignore_errors: true
+  when: node_is_present|failed
+  sudo: no
+
+- name: Load nvm in bash_profile
+  lineinfile: dest=~/.bash_profile line="[[ -s $HOME/.nvm/nvm.sh ]] && . $HOME/.nvm/nvm.sh && nvm use v{{nodejs_version}}"
+  sudo: no
+
+- name: Check tools installed
+  shell: |
+    source ~/.bash_profile
+    npm list -g | grep forever@
+    executable=/bin/bash
+  register: node_tools_are_present
+  ignore_errors: true
+  changed_when: false
+  sudo: no
+
+- name: Install useful tools
+  shell: |
+    source ~/.bash_profile
+    npm install -g {{ item }}
+    executable=/bin/bash
+  with_items:
+    - node-dev
+    - forever
+  when: node_tools_are_present|failed
+  ignore_errors: true
+  sudo: no
+
+- name: Create log dir
+  file: path=/var/log/nodejs state=directory

@@ -1,0 +1,10 @@
+.DS_Store
+.vagrant
+.env
+node_modules
+vagrant_ansible*
+.tmp_vagrant_ssh_config
+*.pyc
+*.swp
+*.swo
+*.log

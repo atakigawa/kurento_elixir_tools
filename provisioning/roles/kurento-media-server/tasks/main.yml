@@ -1,0 +1,20 @@
+---
+
+- name: Add apt repository
+  apt_repository: repo='ppa:kurento/kurento'
+
+- name: Install Kurento Media Server
+  apt: name={{ item }} state=present
+  with_items:
+    - kurento-media-server
+
+- name: Set conf files
+  template: src={{ item }} dest=/etc/kurento/{{ item }}
+  with_items:
+    - kurento.conf.json
+    - sdp_pattern.txt
+  notify:
+    - restart kms
+
+- name: Start KMS
+  service: name=kurento-media-server state=started enabled=true

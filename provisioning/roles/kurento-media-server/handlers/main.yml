@@ -1,0 +1,3 @@
+---
+- name: restart kms
+  service: name=kurento-media-server state=restarted

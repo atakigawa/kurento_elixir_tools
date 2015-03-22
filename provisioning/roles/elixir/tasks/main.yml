@@ -1,0 +1,21 @@
+---
+- name: Check elixir installed
+  shell: which elixir
+  register: elixir_is_present
+  ignore_errors: true
+  changed_when: false
+
+- name: Get repo file
+  get_url:
+    url=http://packages.erlang-solutions.com/erlang-solutions_1.0_all.deb
+    dest=/tmp
+  when: elixir_is_present|failed
+
+- name: Install repo
+  shell: dpkg -i erlang-solutions_1.0_all.deb
+    chdir=/tmp
+  when: elixir_is_present|failed
+
+- name: Install elixir
+  apt: name=elixir update_cache=yes
+  when: elixir_is_present|failed

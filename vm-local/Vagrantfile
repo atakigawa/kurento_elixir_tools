@@ -6,14 +6,25 @@ VAGRANTFILE_API_VERSION = "2"
 
 remote_synced_folder_root = "/opt/kurento-elixir"
 
+# IP address of your LAN's router
+# IMPORTANT! make sure all the IPs set in this file exist in the same subnet.
+ip_default_gw     = "192.168.1.1"
+ip_kurento_elixir = "192.168.1.164"
+
+#shell to set the default gateway on guest machine.
+set_default_gateway_on_vm = <<-SCRIPT
+  ip route delete default 2>&1 >/dev/null
+  ip route add default via #{ip_default_gw}
+SCRIPT
+
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.define :kurento_elixir do |kurento_elixir|
     kurento_elixir.vm.box = "ubuntu/trusty64"
 
     #kurento_elixir.vm.network :forwarded_port, guest: 80, host: 8080
-    kurento_elixir.vm.network :private_network, ip: "192.168.66.11"
-    #kurento_elixir.vm.network :public_network, :bridge => "en0: Wi-Fi (AirPort)", :ip => "#{ip_kurento_elixir}", :netmask => "255.255.255.0"
+    #kurento_elixir.vm.network :private_network, ip: "192.168.66.11"
+    kurento_elixir.vm.network :public_network, :bridge => "en0: Wi-Fi (AirPort)", :ip => "#{ip_kurento_elixir}", :netmask => "255.255.255.0"
 
     kurento_elixir.vm.synced_folder "../../", "#{remote_synced_folder_root}"
 
@@ -29,6 +40,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
       ansible.playbook = "../provisioning/vagrant-local.yml"
       ansible.verbose = "v"
     end
+
+    # change/ensure the default route via the local network's WAN router, useful for public_network/bridged mode
+    kurento_elixir.vm.provision :shell, inline: "#{set_default_gateway_on_vm}", run: "always"
 
   end
 end

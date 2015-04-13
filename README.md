@@ -1,4 +1,4 @@
-# kurento_elixir_tools
+# Kurento Elixir Tools
 Tools to make life easy for using kurento_elixir repository.
 
 Contains..

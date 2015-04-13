@@ -19,3 +19,9 @@
 - name: Install elixir
   apt: name=elixir update_cache=yes
   when: elixir_is_present|failed
+
+# needed to compile erlang libraries
+- name: Install erlang-dev
+  apt: name={{ item }} state=present
+  with_items:
+    - erlang-dev
